@@ -22,5 +22,13 @@ namespace Evry.Evaluation.Controllers
             model = manager.GetEventList();
             return View(model);
         }
+
+        public ActionResult Test()
+        {
+            var model = new List<EventViewModel>();
+            var manager = new EventManager();
+            model = manager.GetEventList();
+            return View(model);
+        }
     }
 }

@@ -25,22 +25,71 @@ namespace Evry.Evaluation.BusinessLogic
             var nextEnd = DateTime.MinValue;
 
             // EVAL: Get dates for previous and next periods
+            DateTime WeekStart(DateTime date)
+            {
+                // Sunday = 0 ---- Saturday = 6 => Monday = 1 ---- Sunday = 7
+                var weekday = (int)date.DayOfWeek != 0 ? (int)date.DayOfWeek : 7;
+                return date.AddDays((weekday - 1) * -1);
+            }
+            DateTime MonthStart(DateTime date)
+            {
+                return date.AddDays((date.Day - 1) * -1);
+            }
+            DateTime QuarterStart(DateTime date)
+            {
+                var currentQuarter = ((date.Month - 1) / 3) + 1;
+                return new DateTime(DateTime.Now.Year, (currentQuarter - 1) * 3 + 1, 1);
+            }
             switch (periodClass)
             {
                 case PeriodClass.Week:
-                    currentStart = DateTime.Now.AddDays(((int)DateTime.Now.DayOfWeek -1) * -1);
+                    // Current week
+                    currentStart = WeekStart(DateTime.Now);
                     // EVAL: Get end of week
+                    currentEnd = currentStart.AddDays(6);
+                    // Previous week
+                    prevStart = WeekStart(DateTime.Now.AddDays(-7));
+                    prevEnd = prevStart.AddDays(6);
+                    // Next week
+                    nextStart = WeekStart(DateTime.Now.AddDays(7)); ;
+                    nextEnd = nextStart.AddDays(6);
                     break;
+
                 case PeriodClass.Month:
-                    currentStart = DateTime.Now.AddDays((DateTime.Now.Day - 1) * -1);
-                    currentEnd = new DateTime(DateTime.Now.Year, DateTime.Now.Month+1, 1).AddDays(-1);
+                    // Current Month
+                    currentStart = MonthStart(DateTime.Now);
+                    currentEnd = new DateTime(currentStart.Year, currentStart.Month+1, 1).AddDays(-1);
+                    // Previous Month
+                    prevStart = MonthStart(new DateTime(DateTime.Now.Year, DateTime.Now.Month - 1, 1));
+                    prevEnd = new DateTime(prevStart.Year, prevStart.Month + 1, 1).AddDays(-1);
+                    // Next Month
+                    nextStart = MonthStart(new DateTime(DateTime.Now.Year, DateTime.Now.Month + 1, 1));
+                    nextEnd = new DateTime(nextStart.Year, nextStart.Month + 1, 1).AddDays(-1);
                     break;
+
                 case PeriodClass.Quarter:
                     // EVAL
+                    // Current quarter
+                    currentStart = QuarterStart(DateTime.Now);
+                    currentEnd = currentStart.AddMonths(3).AddDays(-1);
+                    // Previous quarter
+                    prevStart = QuarterStart(currentEnd.AddMonths(1));
+                    prevEnd = prevStart.AddMonths(3).AddDays(-1);
+                    // Next quarter
+                    nextStart = QuarterStart(currentStart.AddMonths(-1));
+                    nextEnd = nextStart.AddMonths(3).AddDays(-1);
                     break;
+
                 case PeriodClass.Year:
+                    // Current Year
                     currentStart = new DateTime(DateTime.Now.Year, 1, 1);
                     currentEnd = new DateTime(DateTime.Now.Year + 1, 1, 1).AddDays(-1);
+                    // Previous Year
+                    prevStart = new DateTime(DateTime.Now.Year-1, 1, 1);
+                    prevEnd = new DateTime(prevStart.Year + 1, 1, 1).AddDays(-1);
+                    // Next Year
+                    nextStart = new DateTime(DateTime.Now.Year - 1, 1, 1);
+                    nextEnd = new DateTime(nextStart.Year + 1, 1, 1).AddDays(-1);
                     break;
             }
 
@@ -48,8 +97,13 @@ namespace Evry.Evaluation.BusinessLogic
 
             persons.ForEach(person =>
             {
-                var personResult = new ProcessedPersonResult();
+                var personResult = new ProcessedPersonResult
                 // EVAL: Fill personal details
+                {
+                    ID = Guid.NewGuid(),
+                    PersonID = person
+                };
+
 
                 var takeCurrent = new List<int>();
                 var takePrevious = new List<int>();

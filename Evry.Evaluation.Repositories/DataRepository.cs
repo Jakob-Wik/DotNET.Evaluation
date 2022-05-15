@@ -49,7 +49,14 @@ namespace Evry.Evaluation.Repositories
         public IEnumerable<Event> GetEventsByDateRange(DateTime start, DateTime end)
         {
             // EVAL
-            throw new NotImplementedException();
+            IEnumerable<Person> persons = GetPeople().Where(x => x.Starts >= start && x.Leaves <= end);
+            IEnumerable<Guid> tmp = new List<Guid>();
+            foreach (Person person in persons)
+            {
+                tmp.Append<Guid>(person.ID);
+            }
+
+            return _session.Set<Event>().Where(x => tmp.Contains(x.PersonID));
         }
 
         /// <summary>
@@ -70,7 +77,14 @@ namespace Evry.Evaluation.Repositories
         public IEnumerable<Event> GetEventsByRegion(Guid regionId)
         {
             // EVAL
-            throw new NotImplementedException();
+            IEnumerable<Person> persons = GetPeople().Where(x => x.RegionID == regionId);
+            IEnumerable<Guid> tmp = new List<Guid>();
+            foreach (Person person in persons)
+            {
+                tmp.Append<Guid>(person.ID);
+            }
+
+            return _session.Set<Event>().Where(x => tmp.Contains(x.PersonID));
         }
 
         /// <summary>
@@ -118,7 +132,7 @@ namespace Evry.Evaluation.Repositories
         public IEnumerable<Region> GetRegions()
         {
             // EVAL
-            throw new NotImplementedException();
+            return _session.Set<Region>();
         }
 
         #region IDisposable Support

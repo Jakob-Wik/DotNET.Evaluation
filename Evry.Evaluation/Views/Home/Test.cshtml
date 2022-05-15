@@ -1,0 +1,33 @@
+﻿@using Evry.Evaluation.Models
+@model List<EventViewModel>
+@{
+    ViewBag.Title = "Test";
+}
+
+<h2>Test</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Region</th>
+            <th>Person</th>
+            <th>Time</th>
+            <th>Amount</th>
+            <th>Sum</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.TypeName</td>
+                <td>@item.Region</td>
+                <td>@item.PersonName</td>
+                <td>@item.Time</td>
+                <td>@item.Amount</td>
+                <td>@item.Sum</td>
+            </tr>
+        }
+    </tbody>
+</table>
